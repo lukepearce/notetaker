@@ -9,50 +9,87 @@ var Firebase = require('firebase');
 var Profile = React.createClass({
 	mixins: [Router.State, ReactFireMixin],
 	getInitialState: function(){
-		return {
-			notes: [],
-			bio: {},
-			repos: []
+		return { 
+			query: '',
+			appearances: [
+				{
+					factory: '',
+					factoryRange: 'hello',
+					factoryDesc: '124',
+					pentagonName: '',
+					material: 'porcelain',
+					colour: 'white',
+					finish: '',
+					size: '',
+					shape: '',
+					traffic: '',
+					look: '',
+					location: '',
+					imageThumb: ''
+				},
+				{
+					factory: '',
+					factoryRange: 'hahaha',
+					factoryDesc: '123',
+					pentagonName: '',
+					material: '',
+					colour: 'black',
+					finish: '',
+					size: '',
+					shape: '',
+					traffic: '',
+					look: '',
+					location: '',
+					imageThumb: ''
+				}
+			] 
 		}
 	},
-	componentDidMount: function(){
-		var ref = new Firebase('https://vivid-inferno-2517.firebaseio.com');
-		//var rangeRef = this.ref.child('ranges');
-		//this.bindAsArray(ref, 'notes');
-		//var childRef = this.ref.child(this.getParams().username);
-		//this.bindAsArray(childRef, 'notes');
-		var usersRef = ref.child("ranges");
-		usersRef.set({
-		  alanisawesome: {
-		    date_of_birth: "June 23, 1912",
-		    full_name: "Alan Turing"
-		  },
-		  gracehop: {
-		    date_of_birth: "December 9, 1906",
-		    full_name: "Grace Hopper"
-		  }
-		});
 
-		this.bindAsArray(usersRef, 'notes');
-	},
-	componentWillUnmount: function(){
-		this.unbind('notes');
-	},
+	handleChange: function( event ) {
+    this.setState({ query: event.target.value });
+  },
+	
 	render: function(){
-		var username = this.getParams().username;
-		return (
-			<div className="row">
-        <div className="col-md-4">
-          <UserProfile username={username} bio={this.state.bio}/>
-        </div>
-        <div className="col-md-4">
-          <Repos username={username} repos={this.state.repos} />
-        </div>
-        <div className="col-md-4">
-          <Notes username={username} notes={this.state.notes} />
-        </div>
+		var aprncs = this.state.appearances,
+        query = this.state.query.trim().toLowerCase();
+
+    // For the next bits of fun, make sure you
+    // have typed something into the input!
+
+    if (query.length > 0) {
+      aprncs = aprncs.filter(
+        // Feeling lucky? Try swapping these lines:
+        // () => Math.random() > 0.5
+        lib => lib.material.toLowerCase().match(query)
+      );
+    }
+
+    // You know what to do:
+    // return <i>{aprncs.map(l => l.name).join(', ')} are friends!</i>;
+
+    return (
+      <div>
+        <input type='text' // try 'date'
+               value={this.state.query/*.toUpperCase()*/}
+               onChange={this.handleChange}
+               // onMouseEnter={() => this.setState({ query: 'react' })}
+               placeholder='Type to search' />
+        <ul>
+          {aprncs.map(appr =>
+            <li key={appr.factoryDesc}>
+              <a href={appr.url} target='_blank'>
+              	{appr.colour} - {appr.factoryRange}
+              </a>
+            </li>
+          )}
+        </ul>
+        {
+        	aprncs.length === 0 && 
+        	<i>Nothing matched your search</i>
+        }
       </div>
-		);
+    );
 	}
 });
 
